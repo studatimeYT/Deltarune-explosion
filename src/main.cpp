@@ -8,7 +8,7 @@ class $modify(PlayLayer) {
     void destroyPlayer(PlayerObject* player, GameObject* object) {
         auto gm = GameManager::get();
 
-        // Death effect 19 is stored as index 18 internally
+        // GD 2.2091 / Geode v6 uses 64-bit integers for effect IDs
         bool usingEffect19 = (gm->m_playerDeathEffect == 18);
 
         if (usingEffect19 && player) {
