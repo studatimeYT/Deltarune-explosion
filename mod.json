@@ -13,10 +13,10 @@
     "description": "Replaces death effect 19 with a Deltarune explosion!",
     "resources": {
         "sprites": [
-            "boom-explosion_*.png"
+            "resources/boom-explosion_*.png"
         ],
         "files": [
-            "explode_11.ogg"
+            "resources/explode_11.ogg"
         ]
     }
 }
