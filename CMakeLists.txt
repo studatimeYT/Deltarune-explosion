@@ -1,21 +1,42 @@
-cmake_minimum_required(VERSION 3.25)
+lname: Build Geode Mod
 
-project(studatimeYT.deltarune-explosion)
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
-# Geode v6 requires C++23
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - name: Windows
+          os: windows-latest
+          target: Win64
+        - name: Android64
+          os: ubuntu-latest
+          target: Android64
+        - name: Android32
+          os: ubuntu-latest
+          target: Android32
 
-# Make sure the SDK environment variable exists
-if (NOT DEFINED ENV{GEODE_SDK})
-    message(FATAL_ERROR "Unable to find Geode SDK! The environment variable is not set.")
-endif()
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
 
-# Load the SDK directly as a subdirectory
-add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
+    steps:
+      - uses: actions/checkout@v4
 
-# Create the mod library target
-add_library(${PROJECT_NAME} SHARED src/main.cpp)
+      - name: Build the mod
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          combine: true
+          target: ${{ matrix.config.target }}
+          sdk: latest
 
-# Setup the Geode mod (links libraries, packages resources, etc.)
-setup_geode_mod(${PROJECT_NAME})
+      - name: Upload Geode File
+        uses: actions/upload-artifact@v4
+        with:
+          name: Deltarune-${{ matrix.config.name }}
+          path: build/*.geode
