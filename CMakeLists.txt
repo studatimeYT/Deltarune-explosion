@@ -2,18 +2,20 @@ cmake_minimum_required(VERSION 3.25)
 
 project(studatimeYT.deltarune-explosion)
 
+# Geode v6 requires C++23
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Make sure the SDK environment variable exists
 if (NOT DEFINED ENV{GEODE_SDK})
-    message(FATAL_ERROR "Unable to find Geode SDK environment variable!")
+    message(FATAL_ERROR "Unable to find Geode SDK! The environment variable is not set.")
 endif()
 
-# Explicitly point CMake to the Geode SDK's cmake folder
-file(TO_CMAKE_PATH "$ENV{GEODE_SDK}/cmake" GEODE_CMAKE_DIR)
-set(geode_DIR "${GEODE_CMAKE_DIR}" CACHE PATH "Geode SDK CMake dir")
+# Load the SDK directly as a subdirectory
+add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
-find_package(geode REQUIRED)
+# Create the mod library target
+add_library(${PROJECT_NAME} SHARED src/main.cpp)
 
-setup_geode_mod(studatimeYT.deltarune-explosion)
-target_sources(studatimeYT.deltarune-explosion PRIVATE src/main.cpp)
+# Setup the Geode mod
+setup_geode_mod(${PROJECT_NAME})
