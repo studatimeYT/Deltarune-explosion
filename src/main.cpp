@@ -7,20 +7,23 @@ using namespace geode::prelude;
 class $modify(PlayLayer) {
     void destroyPlayer(PlayerObject* player, GameObject* object) {
         auto gm = GameManager::get();
+        
+        // Log the death effect ID so we can see what the game thinks we are using
+        int effectId = gm->m_playerDeathEffect;
+        log::info("Player died. Current death effect ID is: {}", effectId);
 
-        // GD 2.2091 / Geode v6 uses 64-bit integers for effect IDs
-        bool usingEffect19 = (gm->m_playerDeathEffect == 18);
-
-        if (usingEffect19 && player) {
-            // Play custom sound
+        if (effectId == 18 && player) {
+            log::info("Death Effect 19 detected! Trying to play sound...");
             FMODAudioEngine::sharedEngine()->playEffect("explode_11.ogg"_spr);
 
             auto playerPos = player->getPosition();
-
             std::string firstName = fmt::format("boom-explosion_{:02d}.png", 1) + "_spr";
+            
+            log::info("Trying to load first sprite: {}", firstName);
             auto explosionSprite = CCSprite::create(firstName.c_str());
 
             if (explosionSprite) {
+                log::info("Sprite loaded successfully! Building animation...");
                 explosionSprite->setPosition(playerPos);
                 explosionSprite->setScale(1.5f);
 
@@ -35,6 +38,8 @@ class $modify(PlayLayer) {
                             CCRectMake(0, 0, tex->getContentSize().width, tex->getContentSize().height)
                         );
                         animation->addSpriteFrame(spriteFrame);
+                    } else {
+                        log::error("Failed to load frame: {}", frameName);
                     }
                 }
 
@@ -52,9 +57,12 @@ class $modify(PlayLayer) {
                 } else {
                     this->addChild(explosionSprite, 100);
                 }
+            } else {
+                log::error("Failed to create explosion sprite!");
             }
         }
 
+        // Always call original so the player actually dies
         PlayLayer::destroyPlayer(player, object);
     }
 };
