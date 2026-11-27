@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.25)
 
 project(studatimeYT.deltarune-explosion)
 
@@ -11,11 +11,11 @@ if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! The environment variable is not set.")
 endif()
 
-# Load the SDK directly as a subdirectory instead of using find_package
+# Load the SDK directly as a subdirectory
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
-# Set up the mod using the project name
-setup_geode_mod(${PROJECT_NAME})
+# Create the mod library target
+add_library(${PROJECT_NAME} SHARED src/main.cpp)
 
-# Link your source file
-target_sources(${PROJECT_NAME} PRIVATE src/main.cpp)
+# Setup the Geode mod (links libraries, packages resources, etc.)
+setup_geode_mod(${PROJECT_NAME})
